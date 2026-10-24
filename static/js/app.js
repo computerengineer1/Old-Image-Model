@@ -397,7 +397,11 @@ function onGenerationDone(result) {
   state.lastResult = result;
 
   const img = $("output-image");
-  img.src = `${result.image_url}?t=${Date.now()}`;
+  // result.image_url already contains the ?tk=<session token> query string,
+  // so append cache-busting with "&" — using "?" here produced "?tk=...?t=..."
+  // which made /outputs/... return 401 (bad token) and the image never showed.
+  const sep = result.image_url.includes("?") ? "&" : "?";
+  img.src = `${result.image_url}${sep}t=${Date.now()}`;
   img.classList.remove("hidden");
   $("canvas-idle").classList.add("hidden");
   img.onerror = () => toast("error", "Could not display the image", result.filename);
