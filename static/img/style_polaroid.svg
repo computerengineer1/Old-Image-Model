@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60" width="120" height="60">
+  <defs>
+    <linearGradient id="polSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2c88a"/>
+      <stop offset="0.55" stop-color="#e8a87a"/>
+      <stop offset="1" stop-color="#c88a72"/>
+    </linearGradient>
+    <radialGradient id="leak" cx="0.12" cy="0.1" r="0.65">
+      <stop offset="0" stop-color="#ff9a3c" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#ff9a3c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- polaroid frame -->
+  <rect x="4" y="4" width="112" height="52" rx="2" fill="#f4f2ea"/>
+  <rect x="10" y="9" width="100" height="34" fill="url(#polSky)"/>
+  <circle cx="82" cy="18" r="6" fill="#fff2d0" opacity="0.9"/>
+  <path d="M10 36 Q 35 28 60 35 T 110 33 L110 43 L10 43 Z" fill="#8a6a5a" opacity="0.85"/>
+  <rect x="10" y="9" width="100" height="34" fill="url(#leak)"/>
+  <rect x="10" y="9" width="100" height="34" fill="#c86a8a" opacity="0.08"/>
+  <rect x="30" y="47" width="60" height="3" rx="1.5" fill="#b8b0a0"/>
+</svg>

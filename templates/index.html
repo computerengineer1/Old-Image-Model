@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ brand }} — Local Retro AI Image Studio</title>
+  <meta name="omi-token" content="{{ session_token }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" class="brand-logo">
+      <div class="brand-text">
+        <h1 class="wordmark">OLD MODEL <span class="wordmark-accent">IMAGES</span></h1>
+        <p class="tagline">local retro AI image studio &mdash; {{ model_label }} &mdash; runs 100% offline on your GPU</p>
+      </div>
+    </div>
+    <div class="health-badges" id="health-badges" title="System status">
+      <span class="badge ok" id="badge-safety" title="Content-safety status">&#128737; PROTECTED</span>
+      <span class="badge" id="badge-gpu">GPU: &hellip;</span>
+      <span class="badge" id="badge-ram">RAM: &hellip;</span>
+      <span class="badge" id="badge-model">MODEL: &hellip;</span>
+      <span class="badge" id="badge-busy">IDLE</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ================= LEFT: CONTROLS ================= -->
+    <section class="panel controls" aria-label="Generation controls">
+      <div class="field">
+        <label for="prompt">Prompt</label>
+        <textarea id="prompt" rows="4" maxlength="1200"
+          placeholder="a lighthouse on a stormy coast, seagulls, dramatic clouds"></textarea>
+        <div class="field-hint"><span id="prompt-count">0</span>/1200 &middot; Ctrl+Enter to generate</div>
+      </div>
+
+      <div class="field">
+        <label>Style <span class="label-note" id="style-lora-note"></span></label>
+        <div class="style-grid" id="style-grid"><!-- rendered by app.js --></div>
+      </div>
+
+      <div class="field">
+        <label>Aspect ratio</label>
+        <div class="ratio-row" id="ratio-row"><!-- rendered by app.js --></div>
+      </div>
+
+      <div class="field">
+        <label for="resolution">Output resolution</label>
+        <select id="resolution">
+          <option value="standard">Standard 2&times; hires-fix (up to 1824&times;1024)</option>
+          <option value="ultra">Ultra 4&times; Real-ESRGAN (slow, VRAM-hungry)</option>
+        </select>
+        <div class="field-hint" id="resolution-hint">Final size updates with the ratio you pick.</div>
+      </div>
+
+      <details class="advanced" id="advanced">
+        <summary>Advanced settings</summary>
+        <div class="advanced-grid">
+          <div class="field">
+            <label for="steps">Steps <span class="label-note" id="steps-rec"></span></label>
+            <input type="number" id="steps" min="4" max="60" step="1" value="25">
+          </div>
+          <div class="field">
+            <label for="cfg">CFG scale <span class="label-note" id="cfg-rec"></span></label>
+            <input type="number" id="cfg" min="1" max="20" step="0.5" value="7">
+          </div>
+          <div class="field">
+            <label for="sampler">Sampler</label>
+            <select id="sampler"><!-- rendered by app.js --></select>
+          </div>
+          <div class="field">
+            <label for="seed">Seed <span class="label-note">(-1 = random)</span></label>
+            <div class="seed-row">
+              <input type="number" id="seed" min="-1" max="2147483647" step="1" value="-1">
+              <button type="button" class="btn btn-small" id="btn-random-seed" title="Random seed">&#127922; Random</button>
+            </div>
+          </div>
+          <div class="field field-wide">
+            <label for="negative">Negative prompt</label>
+            <textarea id="negative" rows="2" maxlength="1200"
+              placeholder="extra negatives (style negatives are merged automatically)"></textarea>
+          </div>
+          <div class="field field-wide safety-field">
+            <label class="check-label" for="safety-scan">
+              <input type="checkbox" id="safety-scan" checked>
+              <span>AI output scan &mdash; block NSFW images (safety layer 3/3)</span>
+            </label>
+            <div class="field-hint">The prompt filter (EN/AR/multi-language) and forced NSFW
+              negatives are always on and cannot be disabled from the UI.</div>
+          </div>
+          <div class="field">
+            <label for="hires-method">Hires method</label>
+            <select id="hires-method">
+              <option value="img2img">Hires-fix (img2img, denoise 0.4)</option>
+              <option value="esrgan_x2">Real-ESRGAN x2 (faster, no re-denoise)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="perf-mode">Performance mode</label>
+            <select id="perf-mode">
+              <option value="safe">Safe — sequential offload (fits 4 GB, slowest)</option>
+              <option value="balanced">Balanced — model CPU offload</option>
+              <option value="fast">Fast — all on GPU (risky on 4 GB)</option>
+            </select>
+          </div>
+        </div>
+        <p class="advanced-note">Changing performance mode rebuilds the pipeline on the next generation
+          (a few seconds). Safe mode is recommended for 8 GB system RAM.</p>
+      </details>
+
+      <button type="button" class="btn btn-generate" id="btn-generate">
+        <span class="btn-generate-label">&#9654; GENERATE</span>
+      </button>
+      <div class="queue-note" id="queue-note"></div>
+    </section>
+
+    <!-- ================= RIGHT: OUTPUT / GALLERY ================= -->
+    <section class="panel stage" aria-label="Output">
+      <nav class="tabs" role="tablist">
+        <button type="button" class="tab active" id="tab-create" role="tab" aria-selected="true">Output</button>
+        <button type="button" class="tab" id="tab-gallery" role="tab" aria-selected="false">Gallery <span class="tab-count" id="gallery-count">0</span></button>
+      </nav>
+
+      <div class="tab-page" id="page-create">
+        <div class="canvas-wrap" id="canvas-wrap">
+          <div class="canvas-idle" id="canvas-idle">
+            <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="" class="idle-logo">
+            <p>Pick a style, write a prompt,<br>and press <strong>GENERATE</strong>.</p>
+            <p class="idle-sub">First generation loads the model — give it a minute.</p>
+          </div>
+          <img id="output-image" class="output-image hidden" alt="Generated image">
+          <div class="progress-overlay hidden" id="progress-overlay">
+            <div class="progress-phase" id="progress-phase">Loading model&hellip;</div>
+            <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+            <div class="progress-steps" id="progress-steps"></div>
+          </div>
+        </div>
+
+        <div class="info-panel" id="info-panel">
+          <div class="info-row"><span>Seed</span><b id="info-seed">&mdash;</b></div>
+          <div class="info-row"><span>Style</span><b id="info-style">&mdash;</b></div>
+          <div class="info-row"><span>Model</span><b id="info-model">{{ model_label }}</b></div>
+          <div class="info-row"><span>Size</span><b id="info-size">&mdash;</b></div>
+          <div class="info-row"><span>Steps / CFG / Sampler</span><b id="info-params">&mdash;</b></div>
+          <div class="info-row"><span>LoRA</span><b id="info-lora">&mdash;</b></div>
+          <div class="info-row"><span>Time</span><b id="info-time">&mdash;</b></div>
+          <div class="info-actions">
+            <a class="btn btn-small hidden" id="btn-download" download>&#11015; Download PNG</a>
+            <button type="button" class="btn btn-small hidden" id="btn-reuse-seed">&#127922; Reuse seed</button>
+            <button type="button" class="btn btn-small hidden" id="btn-variation">Variation (seed+1)</button>
+          </div>
+          <div class="info-warnings hidden" id="info-warnings"></div>
+        </div>
+      </div>
+
+      <div class="tab-page hidden" id="page-gallery">
+        <div class="gallery-grid" id="gallery-grid"><!-- rendered by app.js --></div>
+        <div class="gallery-empty hidden" id="gallery-empty">
+          <p>No generations yet. Your outputs will collect here &mdash; they persist between sessions.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>OLD MODEL IMAGES v1.1 &middot; secured build</span>
+    <span>SD 1.5 &middot; DreamShaper 8 &middot; Real-ESRGAN</span>
+    <span>offline &middot; private &middot; yours</span>
+  </footer>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

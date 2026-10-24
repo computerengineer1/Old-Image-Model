@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install test dependencies (CPU-only, no CUDA needed)
+        run: |
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install "diffusers==0.27.2" "transformers==4.38.2" "accelerate==0.27.2" \
+                      "peft==0.8.2" "huggingface-hub==0.20.3" safetensors \
+                      Flask==3.0.2 Pillow numpy scipy psutil requests
+
+      - name: Content-safety filter suite
+        run: python tests/test_safety.py
+
+      - name: API + security smoke suite
+        run: python tests/test_app_smoke.py
+
+      - name: End-to-end CPU generation suite (tiny SD pipeline)
+        run: python tests/test_generation_cpu.py
+
+      - name: Model-load regression suite
+        run: python tests/test_model_load_fix.py

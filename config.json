@@ -1,0 +1,52 @@
+{
+  "model": {
+    "repo_id": "Lykon/dreamshaper-8",
+    "local_dir": "models/checkpoints/dreamshaper-8",
+    "name_label": "DreamShaper 8 (SD 1.5)"
+  },
+  "upscaler": {
+    "repo_id": "ai-forever/Real-ESRGAN",
+    "local_dir": "models/upscalers",
+    "x2_file": "RealESRGAN_x2.pth",
+    "x4_file": "RealESRGAN_x4.pth",
+    "tile_size": 384,
+    "tile_overlap": 32
+  },
+  "generation": {
+    "performance_mode": "safe",
+    "hires_method": "img2img",
+    "hires_strength": 0.4,
+    "ultra_upscale_default": false,
+    "use_xformers_if_available": true,
+    "attention_slicing_in_safe_mode": true
+  },
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8756,
+    "open_browser": true,
+    "debug": false
+  },
+  "paths": {
+    "styles": "styles/styles.json",
+    "lora_dir": "styles/lora",
+    "outputs_dir": "outputs",
+    "logs_dir": "logs",
+    "cache_dir": "models/hf-cache"
+  },
+  "security": {
+    "allowed_hosts": [
+      "127.0.0.1",
+      "localhost"
+    ],
+    "allow_lan": false,
+    "api_rate_limit_per_minute": 240,
+    "generate_rate_limit_per_minute": 30
+  },
+  "safety": {
+    "prompt_filter": true,
+    "force_negative": true,
+    "check_outputs": true,
+    "checker_dir": "models/safety",
+    "block_logging": true
+  }
+}

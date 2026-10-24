@@ -1,0 +1,33 @@
+# === NEVER commit these ===
+# Virtual environment
+.venv/
+venv/
+
+# Model weights & caches (download_models.py fetches them; GitHub has a 100 MB file limit)
+models/
+*.pth
+*.safetensors
+*.ckpt
+*.bin
+
+# User data
+outputs/*
+!outputs/.gitkeep
+logs/*
+!logs/.gitkeep
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editors
+.vscode/
+.idea/

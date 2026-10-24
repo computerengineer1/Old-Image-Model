@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60" width="120" height="60">
+  <defs>
+    <linearGradient id="raSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2c3a6e"/>
+      <stop offset="0.6" stop-color="#a85a72"/>
+      <stop offset="1" stop-color="#e8985a"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="60" fill="url(#raSky)"/>
+  <circle cx="86" cy="20" r="10" fill="#f2d8a0" opacity="0.9"/>
+  <!-- speed lines -->
+  <g stroke="#f0e0c8" stroke-width="1" opacity="0.4">
+    <line x1="0" y1="10" x2="52" y2="16"/><line x1="0" y1="22" x2="44" y2="26"/>
+    <line x1="8" y1="34" x2="60" y2="36"/><line x1="0" y1="46" x2="50" y2="44"/>
+  </g>
+  <!-- silhouette figure, cel shaded -->
+  <g fill="#1c1428">
+    <path d="M30 60 L34 40 Q36 30 42 28 Q50 25 52 32 L54 40 L58 60 Z"/>
+    <circle cx="44" cy="22" r="7"/>
+    <path d="M36 18 Q44 8 54 16 L52 20 Q45 14 39 21 Z"/>
+  </g>
+  <path d="M44 15 Q50 13 51 18 L48 19 Q47 16 44 17 Z" fill="#f0d8c0" opacity="0.85"/>
+  <!-- foreground rail -->
+  <rect x="0" y="52" width="120" height="3" fill="#120c1c"/>
+  <g fill="#120c1c"><rect x="10" y="52" width="3" height="8"/><rect x="60" y="52" width="3" height="8"/><rect x="105" y="52" width="3" height="8"/></g>
+  <!-- film grain hint -->
+  <g fill="#ffffff" opacity="0.12">
+    <circle cx="14" cy="6" r="0.6"/><circle cx="64" cy="10" r="0.5"/><circle cx="102" cy="42" r="0.6"/>
+    <circle cx="26" cy="30" r="0.5"/><circle cx="78" cy="50" r="0.5"/>
+  </g>
+</svg>

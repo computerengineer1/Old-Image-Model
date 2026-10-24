@@ -1,0 +1,31 @@
+# OLD MODEL IMAGES — pinned dependency set
+# Verified combination for Windows 11 + RTX 2050 (4 GB) + CUDA 12.x driver,
+# Python 3.10 / 3.11 / 3.12 (64-bit).
+#
+# torch is pulled from the official PyTorch CUDA 12.1 wheel index.
+# NOTE: xformers is intentionally NOT pinned here. setup.bat tries to install
+# xformers==0.0.25 (the build that matches torch 2.2.1) as an optional extra;
+# if it fails, the app automatically uses PyTorch SDPA attention instead.
+
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+torch==2.2.1+cu121
+
+diffusers==0.27.2
+transformers==4.38.2
+tokenizers==0.15.2
+accelerate==0.27.2
+peft==0.8.2
+safetensors==0.4.2
+huggingface-hub==0.20.3
+
+Flask==3.0.2
+Werkzeug==3.0.1
+Jinja2==3.1.3
+
+Pillow==10.2.0
+numpy==1.26.4
+scipy==1.11.4
+psutil==5.9.8
+requests==2.31.0
+tqdm==4.66.2
